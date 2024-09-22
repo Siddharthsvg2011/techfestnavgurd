@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <style>
+        /* Your existing CSS styles remain unchanged */
         body, html {
             margin: 0;
             padding: 0;
@@ -29,30 +30,31 @@
         }
 
         header {
-            background-color: #003366; /* Darker blue for the header */
+            background-color: #003366;
             color: white;
             padding: 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%; /* Set width to full */
-            margin: 0; /* Remove margin for full width */
+            width: 100%;
+            margin: 0;
         }
 
         #logo {
             height: 40px;
         }
 
-        #search {
+        #destination {
             width: 300px;
             padding: 0.5rem 1rem;
             border: 2px solid #ffc107;
             border-radius: 24px;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            margin-right: 10px;
         }
 
-        #search:focus {
+        #destination:focus {
             border-color: #ff9800;
             box-shadow: 0 0 5px rgba(255, 152, 0, 0.5);
             outline: none;
@@ -65,7 +67,7 @@
         }
 
         header button {
-            background-color: #007BFF; /* Blue color for buttons */
+            background-color: #007BFF;
             border: none;
             color: white;
             padding: 12px 0;
@@ -73,19 +75,19 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
             font-size: 1.1em;
-            width: 200px; /* Set all buttons to the same width */
+            width: 200px;
         }
 
         header button#emergency {
-            background-color: #dc3545; /* Emergency button stays red */
+            background-color: #dc3545;
         }
 
         header button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+            background-color: #0056b3;
         }
 
         header button#emergency:hover {
-            background-color: #c82333; /* Darker red on hover */
+            background-color: #c82333;
         }
 
         #main-content {
@@ -194,19 +196,19 @@
         }
 
         #share-location {
-            background-color: #007BFF; /* Same blue for Share Live Location */
+            background-color: #007BFF;
             color: white;
             padding: 12px 0;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            width: 200px; /* Set to the same width */
+            width: 200px;
             transition: background-color 0.3s ease;
             font-size: 1.1em;
         }
 
         #share-location:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+            background-color: #0056b3;
         }
 
         footer {
@@ -214,8 +216,8 @@
             color: white;
             padding: 20px;
             text-align: center;
-            width: 100%; /* Full width */
-            margin-top: auto; /* Push to the bottom */
+            width: 100%;
+            margin-top: auto;
         }
 
         .footer-content p {
@@ -227,7 +229,7 @@
         }
 
         @media (max-width: 600px) {
-            #search {
+            #destination {
                 width: 150px;
             }
 
@@ -247,7 +249,7 @@
     <div id="app">
         <header>
             <img id="logo" src="Screenshot 2024-09-18 162756.png" alt="Logo">
-            <input type="text" id="search" placeholder="Search neighborhood">
+            <input type="text" id="destination" placeholder="Enter destination">
             <div class="button-container">
                 <button id="get-directions">Get Directions</button>
                 <button id="emergency">Emergency</button>
@@ -290,6 +292,7 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
         const map = L.map('map').setView([51.505, -0.09], 13);
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
@@ -371,9 +374,21 @@
         });
 
         document.getElementById('get-directions').addEventListener('click', function() {
-            const start = map.getCenter();
-            const end = L.latLng(51.51, -0.12); // Example destination
-            routingControl.setWaypoints([start, end]);
+            const destination = document.getElementById('destination').value;
+
+            if (destination) {
+                L.Control.Geocoder.nominatim().geocode(destination, (results) => {
+                    if (results.length > 0) {
+                        const end = L.latLng(results[0].center.lat, results[0].center.lng);
+                        const start = map.getCenter();
+                        routingControl.setWaypoints([start, end]);
+                    } else {
+                        alert('Destination not found. Please try again.');
+                    }
+                });
+            } else {
+                alert('Please enter a destination.');
+            }
         });
 
         document.getElementById('share-location').addEventListener('click', function() {
@@ -425,4 +440,5 @@
     </script>
 </body>
 </html>
+
 
